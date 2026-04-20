@@ -17,11 +17,8 @@ def extract_weather(LAT,LON,API_KEY):
 
     return  response.json()
 
-data = extract_weather(LAT,LON, API_KEY)
+data = extract_weather(LAT,LON,API_KEY)
 
-
-raw_data = data
-
-print(raw_data)
+print(data)
 
     

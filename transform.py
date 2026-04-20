@@ -1,41 +1,34 @@
 import pandas as pd
-from extract import raw_data
-import os 
+from extract import data
 
 
-def transform_weather():
+def transform_weather(data):
 
-   filtered_data = {
-        "City"        : raw_data.get("name"),
-        "Country"     : raw_data.get("sys", {}).get("country"),
-        "Condition"   : raw_data.get("weather", [{}])[0].get("description"),
-        "Temp_K"      : raw_data.get("main", {}).get("temp"),
-        "Feels_Like_K": raw_data.get("main", {}).get("feels_like"),
-        "Humidity"    : raw_data.get("main", {}).get("humidity")
-   }
+   weather_data = [{
+        "City"        : data.get("name"),
+        "Country"     : data.get("sys", {}).get("country"),
+        "Condition"   : data.get("weather", [{}])[0].get("description"),
+        "Temp_K"      : data.get("main", {}).get("temp"),
+        "Feels_Like_K": data.get("main", {}).get("feels_like"),
+        "Humidity"    : data.get("main", {}).get("humidity")
+   }]
 
-   clean_data = {}
+   df = pd.DataFrame(weather_data)
+
+   df["Temp_C"] = (df["Temp_K"] - 273.15).round(2)
+
+   df["Feels_Like_C"] = (df["Feels_Like_K"] - 273.15).round(2)
+
+   df = df.drop(columns=["Temp_K", "Feels_Like_K"])
+
+   df["Condition"] = df["Condition"].str.title()
+
+   return df
+
    
-   for key, value in filtered_data.items():
+transformed_df = transform_weather(data)
 
-    if value is not None and "_K" in key:
-
-        new_key = key.replace("_K", "_C")
-
-        clean_data[new_key] = round(value - 273.15, 2)
-    else:
-
-        clean_data[key] = value
-    
-    
-   return clean_data
-
-
-transformed_data = transform_weather()
-
-df = pd.DataFrame([transformed_data])
-
-print(df)
+print(transformed_df)
 
 
 
